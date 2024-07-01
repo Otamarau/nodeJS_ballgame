@@ -3,9 +3,9 @@ const ctx = canvas.getContext('2d');
 
 // Set up canvas for HiDPI displays
 const scale = window.devicePixelRatio;
-canvas.width = 800 * scale;
+canvas.width = 1100 * scale;
 canvas.height = 800 * scale;
-canvas.style.width = '800px';
+canvas.style.width = '1100px';
 canvas.style.height = '800px';
 ctx.scale(scale, scale);
 

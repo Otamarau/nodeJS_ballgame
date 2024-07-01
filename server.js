@@ -6,7 +6,8 @@ const app = express();
 const port = 80;
 
 // Settings
-const MAP_SIZE = 800;
+const MAP_WIDTH = 1100;
+const MAP_HEIGHT = 800;
 const SQUARE_SIZE = 50;
 const BALL_SIZE = 20;
 const BALL_HITBOX_BUFFER = 10;
@@ -25,8 +26,8 @@ const io = socketIo(server);
 
 let players = {};
 let ball = {
-    x: MAP_SIZE / 2,
-    y: MAP_SIZE / 2,
+    x: MAP_WIDTH / 2,
+    y: MAP_HEIGHT / 2,
     size: BALL_SIZE,
     velocityX: 0,
     velocityY: 0
@@ -37,8 +38,8 @@ io.on('connection', (socket) => {
     
     players[socket.id] = {
         id: socket.id,
-        x: Math.random() * (MAP_SIZE - SQUARE_SIZE),
-        y: Math.random() * (MAP_SIZE - SQUARE_SIZE),
+        x: Math.random() * (MAP_WIDTH - SQUARE_SIZE),
+        y: Math.random() * (MAP_HEIGHT - SQUARE_SIZE),
         color: getRandomColor(),
         speedX: 0,
         speedY: 0,
@@ -78,16 +79,16 @@ function checkWallCollision(player) {
         player.x = 0;
         player.speedX = 0;
     }
-    if (player.x + SQUARE_SIZE > MAP_SIZE) {
-        player.x = MAP_SIZE - SQUARE_SIZE;
+    if (player.x + SQUARE_SIZE > MAP_WIDTH) {
+        player.x = MAP_WIDTH - SQUARE_SIZE;
         player.speedX = 0;
     }
     if (player.y < 0) {
         player.y = 0;
         player.speedY = 0;
     }
-    if (player.y + SQUARE_SIZE > MAP_SIZE) {
-        player.y = MAP_SIZE - SQUARE_SIZE;
+    if (player.y + SQUARE_SIZE > MAP_HEIGHT) {
+        player.y = MAP_HEIGHT - SQUARE_SIZE;
         player.speedY = 0;
     }
 }
@@ -162,10 +163,10 @@ function checkBallCollision() {
         const playerTop = player.y;
         const playerBottom = player.y + SQUARE_SIZE;
 
-        const ballLeft = ball.x - ball.size - BALL_HITBOX_BUFFER;
-        const ballRight = ball.x + ball.size + BALL_HITBOX_BUFFER;
-        const ballTop = ball.y - ball.size - BALL_HITBOX_BUFFER;
-        const ballBottom = ball.y + ball.size + BALL_HITBOX_BUFFER;
+        const ballLeft = ball.x - ball.size;
+        const ballRight = ball.x + ball.size;
+        const ballTop = ball.y - ball.size;
+        const ballBottom = ball.y + ball.size;
 
         if (
             playerRight > ballLeft &&
@@ -175,35 +176,30 @@ function checkBallCollision() {
         ) {
             const dx = ball.x - (player.x + SQUARE_SIZE / 2);
             const dy = ball.y - (player.y + SQUARE_SIZE / 2);
-            const distance = Math.sqrt(dx * dx + dy * dy);
             const angle = Math.atan2(dy, dx);
             const hitForce = Math.sqrt(player.speedX * player.speedX + player.speedY * player.speedY) / 10;
 
-            if (hitForce > 0) {
-                ball.velocityX = Math.cos(angle) * BASE_VELOCITY * hitForce;
-                ball.velocityY = Math.sin(angle) * BASE_VELOCITY * hitForce;
-            } else {
-                ball.velocityX += Math.cos(angle) * BASE_VELOCITY * FRICTION;
-                ball.velocityY += Math.sin(angle) * BASE_VELOCITY * FRICTION;
-            }
+            ball.velocityX = Math.cos(angle) * BASE_VELOCITY * hitForce;
+            ball.velocityY = Math.sin(angle) * BASE_VELOCITY * hitForce;
 
             ball.x += ball.velocityX;
             ball.y += ball.velocityY;
 
+            // Ball collision with the map boundaries
             if (ball.x - ball.size < 0) {
                 ball.x = ball.size;
                 ball.velocityX *= -1;
             }
-            if (ball.x + ball.size > MAP_SIZE) {
-                ball.x = MAP_SIZE - ball.size;
+            if (ball.x + ball.size > MAP_WIDTH) {
+                ball.x = MAP_WIDTH - ball.size;
                 ball.velocityX *= -1;
             }
             if (ball.y - ball.size < 0) {
                 ball.y = ball.size;
                 ball.velocityY *= -1;
             }
-            if (ball.y + ball.size > MAP_SIZE) {
-                ball.y = MAP_SIZE - ball.size;
+            if (ball.y + ball.size > MAP_HEIGHT) {
+                ball.y = MAP_HEIGHT - ball.size;
                 ball.velocityY *= -1;
             }
 
@@ -219,20 +215,21 @@ function updateBall() {
     ball.velocityX *= FRICTION;
     ball.velocityY *= FRICTION;
 
+    // Ball collision with the map boundaries
     if (ball.x - ball.size < 0) {
         ball.x = ball.size;
         ball.velocityX *= -1;
     }
-    if (ball.x + ball.size > MAP_SIZE) {
-        ball.x = MAP_SIZE - ball.size;
+    if (ball.x + ball.size > MAP_WIDTH) {
+        ball.x = MAP_WIDTH - ball.size;
         ball.velocityX *= -1;
     }
     if (ball.y - ball.size < 0) {
         ball.y = ball.size;
         ball.velocityY *= -1;
     }
-    if (ball.y + ball.size > MAP_SIZE) {
-        ball.y = MAP_SIZE - ball.size;
+    if (ball.y + ball.size > MAP_HEIGHT) {
+        ball.y = MAP_HEIGHT - ball.size;
         ball.velocityY *= -1;
     }
 
