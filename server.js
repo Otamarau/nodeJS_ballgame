@@ -93,36 +93,6 @@ function checkWallCollision(player) {
     }
 }
 
-function checkPlayerCollision(player) {
-    for (let id in players) {
-        if (id !== player.id) {
-            const other = players[id];
-            if (
-                player.x < other.x + SQUARE_SIZE &&
-                player.x + SQUARE_SIZE > other.x &&
-                player.y < other.y + SQUARE_SIZE &&
-                player.y + SQUARE_SIZE > other.y
-            ) {
-                if (player.speedX > 0 && player.x < other.x) {
-                    player.x = other.x - SQUARE_SIZE;
-                    player.speedX = 0;
-                }
-                if (player.speedX < 0 && player.x > other.x) {
-                    player.x = other.x + SQUARE_SIZE;
-                    player.speedX = 0;
-                }
-                if (player.speedY > 0 && player.y < other.y) {
-                    player.y = other.y - SQUARE_SIZE;
-                    player.speedY = 0;
-                }
-                if (player.speedY < 0 && player.y > other.y) {
-                    player.y = other.y + SQUARE_SIZE;
-                    player.speedY = 0;
-                }
-            }
-        }
-    }
-}
 
 function updatePlayers() {
     for (let id in players) {
@@ -152,6 +122,37 @@ function updatePlayers() {
         checkPlayerCollision(player);
 
         io.emit('playerMoved', player);
+    }
+}
+
+function checkPlayerCollision(player) {
+    for (let id in players) {
+        if (id !== player.id) {
+            const other = players[id];
+            if (
+                player.x < other.x + SQUARE_SIZE &&
+                player.x + SQUARE_SIZE > other.x &&
+                player.y < other.y + SQUARE_SIZE &&
+                player.y + SQUARE_SIZE > other.y
+            ) {
+                if (player.speedX > 0 && player.x < other.x) {
+                    player.x = other.x - SQUARE_SIZE;
+                    player.speedX = 0;
+                }
+                if (player.speedX < 0 && player.x > other.x) {
+                    player.x = other.x + SQUARE_SIZE;
+                    player.speedX = 0;
+                }
+                if (player.speedY > 0 && player.y < other.y) {
+                    player.y = other.y - SQUARE_SIZE;
+                    player.speedY = 0;
+                }
+                if (player.speedY < 0 && player.y > other.y) {
+                    player.y = other.y + SQUARE_SIZE;
+                    player.speedY = 0;
+                }
+            }
+        }
     }
 }
 
